@@ -5,6 +5,9 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import heroBg from "@/assets/hero-bg.jpg";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const emailSchema = z.string().trim().email("Invalid email address").max(255, "Email must be less than 255 characters");
 
 const Hero = () => {
   const [email, setEmail] = useState("");
@@ -16,10 +19,13 @@ const Hero = () => {
 
     setIsSubmitting(true);
     try {
+      // Validate email
+      const validatedEmail = emailSchema.parse(email);
+      
       const { error } = await supabase
         .from('waitlist')
         .insert({
-          email: email.trim(),
+          email: validatedEmail,
           name: 'Quick Signup',
           company: 'Not provided',
           accounting_software: 'Not specified'
