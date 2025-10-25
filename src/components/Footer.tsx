@@ -10,9 +10,9 @@ const Footer = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <img src={logo} alt="Collections Copilot Logo" className="w-8 h-8" />
+              <img src={logo} alt="AER Logo" className="w-8 h-8" />
               <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                Collections Copilot
+                AER
               </span>
             </div>
             <p className="text-sm text-muted-foreground">
@@ -55,7 +55,7 @@ const Footer = () => {
             <a href="#" className="hover:text-primary transition-colors">Terms of Use</a>
           </div>
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 Collections Copilot. All rights reserved.
+            © 2025 AER. All rights reserved.
           </p>
         </div>
       </div>

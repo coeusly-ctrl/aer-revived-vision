@@ -12,9 +12,9 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Collections Copilot Logo" className="w-8 h-8" />
+            <img src={logo} alt="AER Logo" className="w-8 h-8" />
             <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Collections Copilot
+              AER
             </span>
           </div>
 

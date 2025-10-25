@@ -4,18 +4,43 @@ import { Mail, Shield, Zap, DollarSign } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import heroBg from "@/assets/hero-bg.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 const Hero = () => {
   const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleWaitlist = (e: React.FormEvent) => {
+  const handleWaitlist = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
+    if (!email) return;
+
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('waitlist')
+        .insert({
+          email: email.trim(),
+          name: 'Quick Signup',
+          company: 'Not provided',
+          accounting_software: 'Not specified'
+        });
+
+      if (error) throw error;
+
       toast({
         title: "You're on the early-access list!",
         description: "We'll reach out soon with your beta invite.",
       });
       setEmail("");
+    } catch (error) {
+      console.error('Error submitting to waitlist:', error);
+      toast({
+        title: "Oops! Something went wrong",
+        description: "Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -63,9 +88,10 @@ const Hero = () => {
             <Button 
               type="submit"
               size="lg" 
+              disabled={isSubmitting}
               className="bg-gradient-primary hover:opacity-90 transition-opacity shadow-medium"
             >
-              Join the Waitlist
+              {isSubmitting ? "Joining..." : "Join the Waitlist"}
             </Button>
           </form>
 
