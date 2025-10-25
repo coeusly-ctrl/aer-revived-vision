@@ -11,6 +11,15 @@ import {
 import { Sparkles } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const waitlistSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(100),
+  email: z.string().trim().email("Invalid email address").max(255),
+  company: z.string().trim().min(1, "Company is required").max(100),
+  software: z.string().min(1, "Please select your accounting software"),
+});
 
 const CTA = () => {
   const [formData, setFormData] = useState({
@@ -20,14 +29,52 @@ const CTA = () => {
     software: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "You're on the early-access list!",
-      description: "We'll reach out soon with your beta invite. Invite three friends to move up the list.",
-      duration: 5000,
-    });
-    setFormData({ name: "", email: "", company: "", software: "" });
+    setIsSubmitting(true);
+
+    try {
+      // Validate form data
+      const validatedData = waitlistSchema.parse(formData);
+
+      // Insert into database
+      const { error } = await supabase
+        .from('waitlist')
+        .insert({
+          name: validatedData.name,
+          email: validatedData.email,
+          company: validatedData.company,
+          accounting_software: validatedData.software,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "You're on the early-access list!",
+        description: "We'll reach out soon with your beta invite. Invite three friends to move up the list.",
+        duration: 5000,
+      });
+      
+      setFormData({ name: "", email: "", company: "", software: "" });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to join waitlist. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -112,9 +159,10 @@ const CTA = () => {
                 <Button 
                   type="submit"
                   size="lg" 
-                  className="w-full text-lg bg-gradient-primary hover:opacity-90 transition-opacity shadow-medium"
+                  disabled={isSubmitting}
+                  className="w-full text-lg bg-gradient-primary hover:opacity-90 transition-opacity shadow-medium disabled:opacity-50"
                 >
-                  Join the Waitlist
+                  {isSubmitting ? "Joining..." : "Join the Waitlist"}
                 </Button>
               </form>
             </div>
