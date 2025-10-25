@@ -39,7 +39,9 @@ const Hero = () => {
       });
       setEmail("");
     } catch (error) {
-      console.error('Error submitting to waitlist:', error);
+      if (import.meta.env.DEV) {
+        console.error('Error submitting to waitlist:', error);
+      }
       toast({
         title: "Oops! Something went wrong",
         description: "Please try again or contact us directly.",
